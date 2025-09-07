@@ -1,0 +1,34 @@
+name: Register Discord Commands # Nazwa Twojego workflow
+
+on:
+  push:
+    branches:
+      - main # Uruchamia workflow przy każdym pushu do gałęzi main
+    paths:
+      - 'commands/*.js' # Opcjonalnie: Uruchamia tylko jeśli zmieniono pliki komend
+      - 'register-commands.js'
+
+  workflow_dispatch: # Umożliwia ręczne uruchomienie workflow z poziomu GitHub UI
+
+jobs:
+  register-commands:
+    runs-on: ubuntu-latest # System operacyjny, na którym będzie uruchamiany proces
+
+    steps:
+      - name: Checkout repository # Klonuje Twoje repozytorium
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js # Konfiguruje środowisko Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18' # Użyj odpowiedniej wersji Node.js (np. 16, 18, 20)
+
+      - name: Install dependencies # Instaluje zależności z package.json
+        run: npm install
+
+      - name: Register Discord Slash Commands # Uruchamia skrypt rejestrujący komendy
+        run: npm run register
+        env: # Przekazuje sekrety jako zmienne środowiskowe do tego kroku
+          DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          GUILD_ID: ${{ secrets.GUILD_ID }}
